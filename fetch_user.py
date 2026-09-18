@@ -21,6 +21,7 @@ def player_stats(player_id):
         projected_points = 0
 
     player = {
+        "player_id" : player_id,
         "name" : name, 
         "position" : player_info['position'], 
         "team" : player_info['team'],
@@ -59,7 +60,7 @@ def best_waiver_pickup(position):
     free_agents = []
     for player_id in all_players:
         player_info = all_players[player_id]
-        if player_info['position'] == position and player_id not in all_rostered_ids:
+        if player_info['position'] == position and player_id not in all_rostered_ids and player_id not in temp_rostered:
             free_agents.append(player_stats(player_id))
 
     highest = None
@@ -182,3 +183,30 @@ all_rostered_ids = []
 for roster in rosters:
     for player_id in roster['players']:
         all_rostered_ids.append(player_id)
+
+
+potential_waiver = []
+replacement_players = []
+temp_rostered = []
+for pos in order:
+    pos_players = []
+    for players in best_players + flex + new_bench:
+        if players['position'] == pos:
+            pos_players.append(players)
+    pos_players_sorted = sorted(pos_players, key=lambda p: p['projected_points'])
+    for _ in range(len(pos_players_sorted)):
+        lowest = pos_players_sorted[0]
+        new_player = best_waiver_pickup(pos)
+        if new_player is not None:
+                if lowest['projected_points'] < new_player['projected_points']:
+                    potential_waiver.append(new_player)
+                    replacement_players.append(lowest)
+                    temp_rostered.append(new_player['player_id'])
+                    pos_players_sorted.remove(lowest)
+                else: 
+                    break
+# for all players to be replaced, print name and points compared to potential waiver pickups name and points
+for i, player in enumerate(replacement_players):
+    print(f"Player to be replaced: {player['name']}, Projected Points: {player['projected_points']}")
+    if i < len(potential_waiver):
+        print(f"Potential waiver pickup: {potential_waiver[i]['name']}, Projected Points: {potential_waiver[i]['projected_points']} \n")
