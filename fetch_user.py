@@ -14,8 +14,15 @@ def player_stats(player_id):
     else:
         status = "Active"
 
+    player_bye = player_info.get('bye_week')
+    if (player_bye is not None and player_bye == week):
+        status = "BYE"
+
+    unusable_statuses = ['Out', 'IR', 'Doubtful', 'PUP', 'SUS', 'BYE']
+    unusable = status not in unusable_statuses
+    
     projection_info = projections_by_id.get(player_id)
-    if projection_info is not None and 'pts_ppr' in projection_info['stats']:
+    if projection_info is not None and 'pts_ppr' in projection_info['stats'] and unusable:
         projected_points = projection_info['stats']['pts_ppr']
     else:
         projected_points = 0
@@ -65,8 +72,9 @@ def best_waiver_pickup(position):
 
     highest = None
     for player in free_agents:
-        if highest is None or player['projected_points'] > highest['projected_points']:
-            highest = player
+        if player['projected_points'] > 0:
+            if highest is None or player['projected_points'] > highest['projected_points']:
+                highest = player
     return highest
 
 
@@ -205,8 +213,8 @@ for pos in order:
                     pos_players_sorted.remove(lowest)
                 else: 
                     break
+
 # for all players to be replaced, print name and points compared to potential waiver pickups name and points
-for i, player in enumerate(replacement_players):
-    print(f"Player to be replaced: {player['name']}, Projected Points: {player['projected_points']}")
-    if i < len(potential_waiver):
-        print(f"Potential waiver pickup: {potential_waiver[i]['name']}, Projected Points: {potential_waiver[i]['projected_points']} \n")
+#for player, pickup in zip(replacement_players, potential_waiver):
+#    print(f"Player to be replaced: {player['name']} [{player['status']}], Projected Points: {player['projected_points']}")
+ #   print(f"Potential waiver pickup: {pickup['name']} [{pickup['status']}], Projected Points: {pickup['projected_points']}\n")
