@@ -29,6 +29,46 @@ def player_stats(player_id):
     }
     return player
 
+def best_points(start, bench, position):
+    combined = []
+    for player in start:
+        if position == player['position']:
+            combined.append(player)
+    for player in bench:
+        if position == player['position']:
+            combined.append(player)
+
+    if position == 'QB' or position == 'K' or position == 'DEF':
+        n = 1
+    else:
+        n = 2
+
+    best = []
+    for i in range(n):
+        highest = None
+        for player in combined:
+            if highest is None or player['projected_points'] > highest['projected_points']:
+                highest = player
+        if highest is not None:
+            best.append(highest)
+            combined.remove(highest)
+
+    return best
+
+def best_waiver_pickup(position):
+    free_agents = []
+    for player_id in all_players:
+        player_info = all_players[player_id]
+        if player_info['position'] == position and player_id not in all_rostered_ids:
+            free_agents.append(player_stats(player_id))
+
+    highest = None
+    for player in free_agents:
+        if highest is None or player['projected_points'] > highest['projected_points']:
+            highest = player
+    return highest
+
+
 # Access the user's leagues, and get the rosters associated with them
 
 username = "theman2006"
@@ -109,6 +149,36 @@ for player in bench:
     bench_points[position].append(points)
 
 
+# Find best players to start at every position, QB K DEF = 1, RB WR TE = 2
+order = ['QB', 'RB', 'WR', 'TE', 'K', 'DEF']
+combined_players = starters + bench
+combined_players.sort(key=lambda x: x['projected_points'], reverse=True)
+best_players = []
 
+for pos in order:
+    best_starter = best_points(starters, bench, pos)
+    for player in combined_players:
+        if player in best_starter:
+            best_players.append(player)
+new_bench = []
+for player in combined_players:
+    if player not in best_players:
+        new_bench.append(player)
 
+flex_opt = ['RB', 'WR', 'TE']
+flex = []
 
+for _ in range(2):
+    highest = None
+    for player in new_bench:
+        if highest is None or player['projected_points'] > highest['projected_points']:
+            if player['position'] in flex_opt: 
+                highest = player
+    if highest is not None:
+        flex.append(highest)
+        new_bench.remove(highest)
+
+all_rostered_ids = []
+for roster in rosters:
+    for player_id in roster['players']:
+        all_rostered_ids.append(player_id)
