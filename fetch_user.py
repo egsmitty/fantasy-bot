@@ -1,5 +1,6 @@
 import requests
 import json
+from tele_text import send_telegram_message
 
 # Create and return the requested player's info dictionary
 
@@ -19,10 +20,10 @@ def player_stats(player_id):
         status = "BYE"
 
     unusable_statuses = ['Out', 'IR', 'Doubtful', 'PUP', 'SUS', 'BYE']
-    unusable = status not in unusable_statuses
+    usable = status not in unusable_statuses
     
     projection_info = projections_by_id.get(player_id)
-    if projection_info is not None and 'pts_ppr' in projection_info['stats'] and unusable:
+    if projection_info is not None and 'pts_ppr' in projection_info['stats'] and usable:
         projected_points = projection_info['stats']['pts_ppr']
     else:
         projected_points = 0
@@ -206,7 +207,7 @@ for pos in order:
         lowest = pos_players_sorted[0]
         new_player = best_waiver_pickup(pos)
         if new_player is not None:
-                if lowest['projected_points'] < new_player['projected_points']:
+                if lowest['projected_points'] + 0.9 < new_player['projected_points']:
                     potential_waiver.append(new_player)
                     replacement_players.append(lowest)
                     temp_rostered.append(new_player['player_id'])
@@ -214,7 +215,26 @@ for pos in order:
                 else: 
                     break
 
-# for all players to be replaced, print name and points compared to potential waiver pickups name and points
-#for player, pickup in zip(replacement_players, potential_waiver):
-#    print(f"Player to be replaced: {player['name']} [{player['status']}], Projected Points: {player['projected_points']}")
- #   print(f"Potential waiver pickup: {pickup['name']} [{pickup['status']}], Projected Points: {pickup['projected_points']}\n")
+message_lines = []
+
+if best_players + flex != starters:
+    message_lines.append("Suggested lineup changes:")
+    for player in best_players + flex:
+        if player not in starters:
+            message_lines.append(f"- Start {player['name']} ({player['position']}, {player['projected_points']} pts)")
+else:
+    message_lines.append("Your lineup is already optimal.")
+
+if potential_waiver:
+    message_lines.append("")
+    message_lines.append("Waiver suggestions:")
+    for i in range(len(potential_waiver)):
+        new_player = potential_waiver[i]
+        old_player = replacement_players[i]
+        message_lines.append(
+            f"- Pick up {new_player['name']} ({new_player['projected_points']} pts) "
+            f"over {old_player['name']} ({old_player['projected_points']} pts)"
+        )
+
+message = "\n".join(message_lines)
+send_telegram_message(message)
