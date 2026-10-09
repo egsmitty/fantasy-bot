@@ -6,8 +6,7 @@ This project is built for a single user's league workflow and is designed to be 
 
 ## What it does
 
-- Pulls your Sleeper user and league data
-- Loads player metadata and current NFL week state
+- Pulls your Sleeper user and league data and loads player metadata and current NFL week state
 - Calculates projected points for your starters and bench players
 - Recommends the best lineup optimizations by position
 - Identifies waiver-wire additions that could outperform current rostered players
@@ -73,7 +72,7 @@ TELEGRAM_CHAT_ID=your_telegram_chat_id
 
 5. Update the hardcoded values in `fetch_user.py` to match your Sleeper account and league:
 
-- `username = "theman2006"` → your Sleeper username
+- `username = "___"` → your Sleeper username
 - `league_response = requests.get(...)` and `roster_response = requests.get(...)` → your league and roster configuration
 
 6. Run the bot:
@@ -108,31 +107,15 @@ Waiver suggestions:
 
 ## Notes
 
-- The project currently uses hardcoded Sleeper values for the user and league. You should update those values to match your own league setup before using it.
+- The project currently supports a single user and hardcoded Sleeper values for said user and league. As of now update those values to match your own league setup before using it.
 - The script writes a local `players.json` file so it can cache the Sleeper player data during runtime.
 - The bot is intended for personal automation and can be extended to schedule recurring checks using cron, GitHub Actions, or a hosted scheduler.
 
-## Future improvements
-
-Potential improvements include:
+## Possible future improvements
 
 - moving league and user configuration to environment variables
-- adding command-line arguments for username, season, and league ID
+- adding command-line arguments for username, season, or league ID
 - handling multiple leagues or multiple users
-- adding error handling for API failures and rate limiting
+- adding error handling for API failures and rate limiting if it went beyond my personal use
 - logging results to a file or database
 - adding tests for the lineup optimization logic
-
-## License
-
-This project does not currently include a license file. If you plan to share or distribute it publicly, consider adding an open-source license such as MIT.
-
-## Contributing
-
-If you want to expand or improve the project:
-
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Submit a pull request with a clear summary of improvements
-
