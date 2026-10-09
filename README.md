@@ -1,44 +1,45 @@
 # Fantasy Bot
 
-Fantasy Bot is a lightweight Python automation for fantasy football decision support. It connects to the Sleeper API, evaluates your roster and projected points, identifies the strongest lineup adjustments, and sends a concise Telegram update with suggested lineup changes and waiver pickups.
+Fantasy Bot is a lightweight Python automation for fantasy football decision support. It connects to Sleeper, evaluates your roster and projected points, identifies the best lineup changes, and flags waiver-wire pickups that may outperform your current players. Results are sent via Telegram.
 
-This project is built for a single user's league workflow and is designed to be easy to customize for your own roster, league settings, and Telegram channel.
+This project is designed for a single user's league workflow and is easy to customize for your own roster, league settings, and Telegram channel.
 
 ## What it does
 
-- Pulls your Sleeper user and league data and loads player metadata and current NFL week state
-- Calculates projected points for your starters and bench players
-- Recommends the best lineup optimizations by position
-- Identifies waiver-wire additions that could outperform current rostered players
-- Sends the results via Telegram
+- Pulls your Sleeper user and league data
+- Loads current player metadata and weekly NFL state
+- Compares starter projections against bench players
+- Recommends optimized starts by position
+- Identifies waiver additions that could improve your roster
+- Sends the final summary to Telegram
 
-## Current repo structure
+## Repo structure
 
-- `fetch_user.py` – main fantasy analysis logic and recommendation engine
-- `tele_text.py` – helper to send a Telegram message
+- `fetch_user.py` – main analysis and recommendation logic
+- `tele_text.py` – Telegram message helper
 - `requirements.txt` – Python dependencies
 - `README.md` – project documentation
 
 ## Features
 
 ### Lineup optimization
-The bot compares your current starters to your bench and evaluates which players should be started at each position based on projected points. It accounts for:
+The bot compares your starters to your bench and evaluates which players should be started at each position based on projected points. It accounts for:
 
 - QB, RB, WR, TE, K, and DEF slots
-- currently rostered starters versus bench players
-- bye weeks and injury/availability status
+- current starters versus bench players
+- bye weeks and availability status
 - flex considerations for RB/WR/TE
 
 ### Waiver suggestions
-The bot checks free agents from the same positions and recommends pickups when the projected value exceeds the weakest player currently on your roster.
+The bot checks free agents in relevant positions and recommends pickups when their projected value exceeds the weakest player currently on your roster.
 
 ### Telegram notifications
-The project sends a formatted message through the Telegram Bot API. This makes it easy to receive lineup updates in a group chat or personal DM.
+The project sends a formatted message through the Telegram Bot API, which makes it easy to receive lineup updates in a group chat or direct message.
 
 ## Requirements
 
 - Python 3.9+
-- A Sleeper account and access to your fantasy league
+- A Sleeper account and access to your league
 - A Telegram bot token and chat ID
 
 ## Setup
@@ -85,14 +86,13 @@ python fetch_user.py
 
 `fetch_user.py` does the following:
 
-1. Fetches the Sleeper user profile using the configured username
+1. Fetches your Sleeper user profile
 2. Finds the relevant league and roster data
-3. Loads all NFL players from Sleeper
+3. Loads player metadata from Sleeper
 4. Pulls current-week fantasy projections
-5. Builds player metadata for starters and bench players
-6. Compares projected points to find optimal starts
-7. Checks free agents for waiver recommendations
-8. Sends the final summary to Telegram using `tele_text.py`
+5. Compares projected points to find the best lineup
+6. Checks free agents for waiver recommendations
+7. Sends the results to Telegram
 
 ## Example output
 
@@ -107,15 +107,6 @@ Waiver suggestions:
 
 ## Notes
 
-- The project currently supports a single user and hardcoded Sleeper values for said user and league. As of now update those values to match your own league setup before using it.
-- The script writes a local `players.json` file so it can cache the Sleeper player data during runtime.
-- The bot is intended for personal automation and can be extended to schedule recurring checks using cron, GitHub Actions, or a hosted scheduler.
-
-## Possible future improvements
-
-- moving league and user configuration to environment variables
-- adding command-line arguments for username, season, or league ID
-- handling multiple leagues or multiple users
-- adding error handling for API failures and rate limiting if it went beyond my personal use
-- logging results to a file or database
-- adding tests for the lineup optimization logic
+- The project currently supports a single user and hardcoded Sleeper values for that user and league.
+- The script writes a local `players.json` file to cache Sleeper player data during runtime.
+- This is intended for personal automation and can be extended to run on a schedule with cron, GitHub Actions, or a hosted service.
